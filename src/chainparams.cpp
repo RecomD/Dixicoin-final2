@@ -7,6 +7,30 @@
 
 #include "assert.h"
 #include "chainparams.h"
+
+void MineGenesis(CBlock genesis){
+    // This will figure out a valid hash and Nonce if you're creating a different genesis block:
+    uint256 hashTarget = CBigNum().SetCompact(Params().ProofOfWorkLimit().GetCompact()).getuint256();
+    printf("Target: %s\n", hashTarget.GetHex().c_str());
+    uint256 newhash = genesis.GetHash();
+    uint256 besthash;
+    memset(&besthash,0xFF,32);
+    while (newhash > hashTarget) {
+        ++genesis.nNonce;
+        if (genesis.nNonce == 0){
+            printf("NONCE WRAPPED, incrementing time");
+            ++genesis.nTime;
+        }
+    newhash = genesis.GetHash();
+    if(newhash < besthash){
+        besthash=newhash;
+        printf("New best: %s\n", newhash.GetHex().c_str());
+    }
+    }
+    printf("Found Genesis, Nonce: %ld, Hash: %s\n", genesis.nNonce, genesis.GetHash().GetHex().c_str());
+    printf("Gensis Hash Merkle: %s\n", genesis.hashMerkleRoot.ToString().c_str());
+}
+
 #include "main.h"
 #include "util.h"
 #include "base58.h"
@@ -82,7 +106,7 @@ public:
         nRPCPort = 15969;
         bnProofOfWorkLimit = CBigNum(~uint256(0) >> 16); // starting difficulty is 1 / 2^12
 		
-        const char* pszTimestamp = "20/Jan/2018 - Dixicoin v2 was born thanks to Recom (new Admin) & Zeus (new Lead Dev).";
+        const char* pszTimestamp = "09/Feb/2018 - Dixicoin v2 was born thanks to Recom#1337.";
         std::vector<CTxIn> vin;
         vin.resize(1);
         vin[0].scriptSig = CScript() << 0 << CBigNum(42) << vector<unsigned char>((const unsigned char*)pszTimestamp, (const unsigned char*)pszTimestamp + strlen(pszTimestamp));
@@ -90,7 +114,7 @@ public:
         vout.resize(1);
         vout[0].SetEmpty();
 		
-        CTransaction txNew(1, 1516154401, vin, vout, 0);
+        CTransaction txNew(1, 1518134400, vin, vout, 0);
 
         LogPrintf("genesis mainnet transaction:  %s\n", txNew.ToString().c_str());
 
@@ -99,15 +123,16 @@ public:
         genesis.hashPrevBlock = 0;
         genesis.hashMerkleRoot = genesis.BuildMerkleTree();
         genesis.nVersion = 1;
-        genesis.nTime    = 1516154401;
+        genesis.nTime    = 1518134400;
         genesis.nBits    = bnProofOfWorkLimit.GetCompact(); 
-        genesis.nNonce   = 13413;
+        genesis.nNonce   = 73134;
 	
         hashGenesisBlock = genesis.GetHash();
 
-        assert(hashGenesisBlock == uint256("0x15df929379fabc714939f5dd7a4f88b7154a89e13fcaf7d801cb27c67aa90bde"));
-        assert(genesis.hashMerkleRoot == uint256("0x7db8b79459ca7df5cc7421837779af02e63234594326bb55463b19ea35859c97"));
+        //assert(hashGenesisBlock == uint256("0x15df929379fabc714939f5dd7a4f88b7154a89e13fcaf7d801cb27c67aa90bde"));
+        //assert(genesis.hashMerkleRoot == uint256("0x7db8b79459ca7df5cc7421837779af02e63234594326bb55463b19ea35859c97"));
 
+		MineGenesis(genesis)
         
         base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1,30); // D
         base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1,21);
