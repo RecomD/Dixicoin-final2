@@ -7,6 +7,20 @@
 
 #include "assert.h"
 #include "chainparams.h"
+#include "main.h"
+#include "util.h"
+#include "base58.h"
+#include <boost/assign/list_of.hpp>
+
+using namespace boost::assign;
+
+struct SeedSpec6 {
+    uint8_t addr[16];
+    uint16_t port;
+};
+
+#include "chainparamsseeds.h"
+
 
 void MineGenesis(CBlock genesis){
     // This will figure out a valid hash and Nonce if you're creating a different genesis block:
@@ -30,20 +44,6 @@ void MineGenesis(CBlock genesis){
     printf("Found Genesis, Nonce: %ld, Hash: %s\n", genesis.nNonce, genesis.GetHash().GetHex().c_str());
     printf("Gensis Hash Merkle: %s\n", genesis.hashMerkleRoot.ToString().c_str());
 }
-
-#include "main.h"
-#include "util.h"
-#include "base58.h"
-#include <boost/assign/list_of.hpp>
-
-using namespace boost::assign;
-
-struct SeedSpec6 {
-    uint8_t addr[16];
-    uint16_t port;
-};
-
-#include "chainparamsseeds.h"
 
 //
 // Main network
